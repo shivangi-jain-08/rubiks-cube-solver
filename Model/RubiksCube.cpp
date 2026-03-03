@@ -4,7 +4,6 @@
 
 #include "RubiksCube.h"
 
-
 char RubiksCube::getColorLetter(COLOR color)
 {
     switch (color)
@@ -67,7 +66,7 @@ string RubiksCube::getMove(MOVE ind)
     }
 }
 
-RubiksCube& RubiksCube::move(MOVE ind)
+RubiksCube &RubiksCube::move(MOVE ind)
 {
     switch (ind)
     {
@@ -110,8 +109,7 @@ RubiksCube& RubiksCube::move(MOVE ind)
     }
 }
 
-
-RubiksCube& RubiksCube::invert(MOVE ind)
+RubiksCube &RubiksCube::invert(MOVE ind)
 {
     switch (ind)
     {
@@ -160,7 +158,8 @@ void RubiksCube::print() const
 
     for (int row = 0; row <= 2; row++)
     {
-        for (unsigned i = 0; i < 7; i++) cout << " ";
+        for (unsigned i = 0; i < 7; i++)
+            cout << " ";
         for (int col = 0; col <= 2; col++)
         {
             cout << getColorLetter(getColor(FACE::UP, row, col)) << " ";
@@ -201,7 +200,8 @@ void RubiksCube::print() const
 
     for (int row = 0; row <= 2; row++)
     {
-        for (unsigned i = 0; i < 7; i++) cout << " ";
+        for (unsigned i = 0; i < 7; i++)
+            cout << " ";
         for (int col = 0; col <= 2; col++)
         {
             cout << getColorLetter(getColor(FACE::DOWN, row, col)) << " ";
@@ -232,8 +232,7 @@ vector<RubiksCube::MOVE> RubiksCube::randomShuffle(unsigned int times)
         do
         {
             move = static_cast<MOVE>(dist(rng));
-        }
-        while (hasLast && faceOf(move) == faceOf(lastMove));
+        } while (hasLast && faceOf(move) == faceOf(lastMove));
 
         moves_performed.push_back(move);
         this->move(move);
@@ -244,7 +243,6 @@ vector<RubiksCube::MOVE> RubiksCube::randomShuffle(unsigned int times)
 
     return moves_performed;
 }
-
 
 string RubiksCube::getCornerColorString(uint8_t ind) const
 {
@@ -318,7 +316,8 @@ uint8_t RubiksCube::getCornerIndex(uint8_t ind) const
     uint8_t ret = 0;
     for (auto c : corner)
     {
-        if (c != 'W' && c != 'Y') continue;
+        if (c != 'W' && c != 'Y')
+            continue;
         if (c == 'Y')
         {
             ret |= (1 << 2);
@@ -327,7 +326,8 @@ uint8_t RubiksCube::getCornerIndex(uint8_t ind) const
 
     for (auto c : corner)
     {
-        if (c != 'R' && c != 'O') continue;
+        if (c != 'R' && c != 'O')
+            continue;
         if (c == 'O')
         {
             ret |= (1 << 1);
@@ -336,7 +336,8 @@ uint8_t RubiksCube::getCornerIndex(uint8_t ind) const
 
     for (auto c : corner)
     {
-        if (c != 'B' && c != 'G') continue;
+        if (c != 'B' && c != 'G')
+            continue;
         if (c == 'G')
         {
             ret |= (1 << 0);
@@ -353,7 +354,8 @@ uint8_t RubiksCube::getCornerOrientation(uint8_t ind) const
 
     for (auto c : corner)
     {
-        if (c != 'W' && c != 'Y') continue;
+        if (c != 'W' && c != 'Y')
+            continue;
         actual_str.push_back(c);
     }
 
@@ -365,5 +367,6 @@ uint8_t RubiksCube::getCornerOrientation(uint8_t ind) const
     {
         return 2;
     }
-    else return 0;
+    else
+        return 0;
 }

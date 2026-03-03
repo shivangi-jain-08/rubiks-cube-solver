@@ -21,7 +21,7 @@ private:
 
     static constexpr int FOUND = -1;
 
-    int search(T& cube, int g, int bound, int lastMove, int heuristic)
+    int search(T &cube, int g, int bound, int lastMove, int heuristic)
     {
         int h = heuristic >= 0 ? heuristic : cornerDB.getNumMoves(cube);
         int f = g + h;
@@ -66,14 +66,13 @@ private:
             candidates.push_back({i, childHeuristic});
         }
 
-        sort(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b)
-        {
+        sort(candidates.begin(), candidates.end(), [](const Candidate &a, const Candidate &b)
+             {
             if (a.heuristic == b.heuristic)
                 return a.moveIdx < b.moveIdx;
-            return a.heuristic < b.heuristic;
-        });
+            return a.heuristic < b.heuristic; });
 
-        for (const auto& candidate : candidates)
+        for (const auto &candidate : candidates)
         {
             auto moveEnum = static_cast<RubiksCube::MOVE>(candidate.moveIdx);
             cube.move(moveEnum);
@@ -138,15 +137,12 @@ private:
 public:
     T rubiksCube;
 
-    IDAstarSolver(T cube, const
-                  string& dbFile)
+    IDAstarSolver(T cube, const string &dbFile)
         : rubiksCube(cube)
     {
         if (!cornerDB.fromFile(dbFile))
-            throw
-                runtime_error("Failed to load Corner Pattern Database file.");
+            throw runtime_error("Failed to load Corner Pattern Database file.");
     }
-
 
     vector<RubiksCube::MOVE> solve()
     {
@@ -166,4 +162,4 @@ public:
     }
 };
 
-#endif //RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
+#endif // RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
