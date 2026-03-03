@@ -36,7 +36,7 @@ private:
     }
 
 
-    int get5bitCorner(string corner)
+    int get5bitCorner(const string corner) const
     {
         int ret = 0;
         string actual_str;
@@ -360,7 +360,7 @@ public:
     }
 
 
-    uint64_t getCorners()
+    uint64_t getCorners() const
     {
         uint64_t ret = 0;
         string top_front_right = "";

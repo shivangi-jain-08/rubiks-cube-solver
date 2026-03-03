@@ -8,118 +8,91 @@
 #ifndef RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
 #define RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
 
-template <typename T, typename H>
+template <typename T>
 class IDAstarSolver
 {
 private:
     PatternDatabase<T> patternDB;
-    vector<RubiksCube::MOVE> moves;
-    unordered_map<T, RubiksCube::MOVE, H> move_done;
-    unordered_map<T, bool, H> visited;
+    vector<RubiksCube::MOVE> path;
+    T cube;
 
-    struct Node
+    static constexpr int FOUND = -1;
+
+    bool areOpposite(RubiksCube::MOVE a, RubiksCube::MOVE b)
     {
-        T cube;
-        int depth;
-        int estimate;
+        int f1 = RubiksCube::faceOf(a);
+        int f2 = RubiksCube::faceOf(b);
 
-        Node(T _cube, int _depth, int _estimate) : cube(_cube), depth(_depth), estimate(_estimate)
-        {
-        };
-    };
-
-    struct compareCube
-    {
-        bool operator()(pair<Node, int> const& p1, pair<Node, int> const& p2)
-        {
-            auto n1 = p1.first, n2 = p2.first;
-            if (n1.depth + n1.estimate == n2.depth + n2.estimate)
-            {
-                return n1.estimate > n2.estimate;
-            }
-            else return n1.depth + n1.estimate > n2.depth + n2.estimate;
-        }
-    };
-
-    void resetStructure()
-    {
-        moves.clear();
-        move_done.clear();
-        visited.clear();
+        return (f1 == 0 && f2 == 5) || (f1 == 5 && f2 == 0) ||
+            (f1 == 1 && f2 == 3) || (f1 == 3 && f2 == 1) ||
+            (f1 == 2 && f2 == 4) || (f1 == 4 && f2 == 2);
     }
 
-
-    pair<T, int> IDAstar(int bound)
+    int search(int g, int bound, RubiksCube::MOVE lastMove, bool hasLast)
     {
-        priority_queue<pair<Node, int>, vector<pair<Node, int>>, compareCube> pq;
-        Node start = Node(rubiksCube, 0, patternDB.getEstimate(rubiksCube));
-        pq.push(make_pair(start, 0));
-        int next_bound = 100;
-        while (!pq.empty())
+        int h = patternDB.getEstimate(cube);
+        int f = g + h;
+
+        if (f > bound) return f;
+        if (cube.isSolved()) return FOUND;
+
+        int minNextBound = INT_MAX;
+
+        for (int i = 0; i < 18; i++)
         {
-            auto p = pq.top();
-            Node node = p.first;
-            pq.pop();
+            auto move = RubiksCube::MOVE(i);
 
-            if (visited[node.cube]) continue;
-
-            visited[node.cube] = true;
-            move_done[node.cube] = RubiksCube::MOVE(p.second);
-
-            if (node.cube.isSolved()) return make_pair(node.cube, bound);
-            node.depth++;
-            for (int i = 0; i < 18; i++)
+            if (hasLast)
             {
-                auto curr_move = RubiksCube::MOVE(i);
-                node.cube.move(curr_move);
-                if (!visited[node.cube])
-                {
-                    node.estimate = patternDB.getEstimate(node.cube);
-                    if (node.estimate + node.depth > bound)
-                    {
-                        next_bound = min(next_bound, node.estimate + node.depth);
-                    }
-                    else
-                    {
-                        pq.push(make_pair(node, i));
-                    }
-                }
-                node.cube.invert(curr_move);
+                int f_curr = RubiksCube::faceOf(move);
+                int f_last = RubiksCube::faceOf(lastMove);
+
+
+                if (f_curr == f_last) continue;
+
+
+                if (areOpposite(move, lastMove) && f_curr < f_last) continue;
             }
+
+            cube.move(move);
+            path.push_back(move);
+
+            int t = search(g + 1, bound, move, true);
+
+            if (t == FOUND) return FOUND;
+
+            if (t < minNextBound) minNextBound = t;
+
+            path.pop_back();
+            cube.invert(move);
         }
-        return make_pair(rubiksCube, next_bound);
+
+        return minNextBound;
     }
 
 public:
-    T rubiksCube;
-
-    IDAstarSolver(T _rubiksCube)
+    IDAstarSolver(T startCube)
     {
-        rubiksCube = _rubiksCube;
+        cube = startCube;
     }
 
     vector<RubiksCube::MOVE> solve()
     {
-        int bound = 1;
-        auto p = IDAstar(bound);
-        while (p.second != bound)
+        int bound = patternDB.getEstimate(cube);
+        cout << "Initial heuristic: " << patternDB.getEstimate(cube) << "\n";
+
+        while (true)
         {
-            resetStructure();
-            bound = p.second;
-            p = IDAstar(bound);
+            int t = search(0, bound, RubiksCube::MOVE::U, false);
+
+            if (t == FOUND)
+                return path;
+
+            if (t == INT_MAX)
+                return {};
+
+            bound = t;
         }
-        T solved_cube = p.first;
-        assert(solved_cube.isSolved());
-        T curr_cube = solved_cube;
-        while (!(curr_cube == rubiksCube))
-        {
-            RubiksCube::MOVE curr_move = move_done[curr_cube];
-            moves.push_back(curr_move);
-            curr_cube.invert(curr_move);
-        }
-        rubiksCube = solved_cube;
-        reverse(moves.begin(), moves.end());
-        return moves;
     }
 };
 

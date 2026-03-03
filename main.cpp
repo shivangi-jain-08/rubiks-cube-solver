@@ -71,14 +71,26 @@ int main()
     cube.print();
 
     vector<RubiksCube::MOVE> shuffle_moves = cube.randomShuffle(6);
-    for (auto move: shuffle_moves) cout << cube.getMove(move) << " ";
+
+    cout << "Shuffle: ";
+    for (auto move : shuffle_moves)
+        cout << RubiksCube::getMove(move) << " ";
     cout << "\n";
+
     cube.print();
 
-    IDAstarSolver<RubiksCubeBitboard, HashBitboard> idAstarSolver(cube);
-    vector<RubiksCube::MOVE> solve_moves = idAstarSolver.solve();
-    for (auto move: solve_moves) cout << cube.getMove(move) << " ";
-    cout << "\n";
-    idAstarSolver.rubiksCube.print();
+    IDAstarSolver<RubiksCubeBitboard> solver(cube);
 
+    vector<RubiksCube::MOVE> solve_moves = solver.solve();
+
+    cout << "Solution: ";
+    for (auto move : solve_moves)
+        cout << RubiksCube::getMove(move) << " ";
+    cout << "\n";
+
+    for (auto move : solve_moves)
+        cube.move(move);
+
+    cout << "After solving:\n";
+    cube.print();
 }
