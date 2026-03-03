@@ -26,6 +26,25 @@ uint32_t CornerPatternDatabase::getDatabaseIndex(const RubiksCube& cube) const
         cube.getCornerIndex(7),
     };
 
+    array<bool, 8> check = {};
+    for (int i = 0; i < 8; i++)
+    {
+        if (cornerPerm[i] > 7)
+        {
+            cout << "Invalid corner value: " << (int)cornerPerm[i] << endl;
+            throw "Corner out of range";
+        }
+        if (check[cornerPerm[i]])
+        {
+            cout << "Duplicate corner value detected\n";
+            for (int j = 0; j < 8; j++)
+                cout << (int)cornerPerm[j] << " ";
+            cout << endl;
+            throw "Duplicate corner index";
+        }
+        check[cornerPerm[i]] = true;
+    }
+
     uint32_t rank = this->permIndexer.rank(cornerPerm);
 
     array<uint8_t, 7> cornerOrientations = {

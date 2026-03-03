@@ -2,8 +2,11 @@
 // Created by Shivangi on 03-03-2026.
 //
 
+#include <bits/stdc++.h>
 #include "../Model/RubiksCube.h"
-#include "../Model/PatternDatabase/PatternDatabase.h"
+#include "../PatternDatabases/CornerPatternDatabase.h"
+
+using namespace std;
 
 #ifndef RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
 #define RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
@@ -12,84 +15,74 @@ template <typename T>
 class IDAstarSolver
 {
 private:
-    PatternDatabase<T> patternDB;
-    vector<RubiksCube::MOVE> path;
-    T cube;
+    CornerPatternDatabase cornerDB;
+
+    vector<RubiksCube::MOVE> moves;
 
     static constexpr int FOUND = -1;
 
-    bool areOpposite(RubiksCube::MOVE a, RubiksCube::MOVE b)
+    int search(T& cube, int g, int bound, int lastMove)
     {
-        int f1 = RubiksCube::faceOf(a);
-        int f2 = RubiksCube::faceOf(b);
-
-        return (f1 == 0 && f2 == 5) || (f1 == 5 && f2 == 0) ||
-            (f1 == 1 && f2 == 3) || (f1 == 3 && f2 == 1) ||
-            (f1 == 2 && f2 == 4) || (f1 == 4 && f2 == 2);
-    }
-
-    int search(int g, int bound, RubiksCube::MOVE lastMove, bool hasLast)
-    {
-        int h = patternDB.getEstimate(cube);
+        int h = cornerDB.getNumMoves(cube);
         int f = g + h;
 
-        if (f > bound) return f;
-        if (cube.isSolved()) return FOUND;
+        if (f > bound)
+            return f;
+
+        if (cube.isSolved())
+            return FOUND;
 
         int minNextBound = INT_MAX;
 
         for (int i = 0; i < 18; i++)
         {
-            auto move = RubiksCube::MOVE(i);
+            // Korf pruning: avoid same face repetition
+            if (lastMove != -1 &&
+                RubiksCube::faceOf(RubiksCube::MOVE(i)) ==
+                RubiksCube::faceOf(RubiksCube::MOVE(lastMove)))
+                continue;
 
-            if (hasLast)
-            {
-                int f_curr = RubiksCube::faceOf(move);
-                int f_last = RubiksCube::faceOf(lastMove);
+            cube.move(RubiksCube::MOVE(i));
+            moves.push_back(RubiksCube::MOVE(i));
 
+            int t = search(cube, g + 1, bound, i);
 
-                if (f_curr == f_last) continue;
+            if (t == FOUND)
+                return FOUND;
 
+            if (t < minNextBound)
+                minNextBound = t;
 
-                if (areOpposite(move, lastMove) && f_curr < f_last) continue;
-            }
-
-            cube.move(move);
-            path.push_back(move);
-
-            int t = search(g + 1, bound, move, true);
-
-            if (t == FOUND) return FOUND;
-
-            if (t < minNextBound) minNextBound = t;
-
-            path.pop_back();
-            cube.invert(move);
+            moves.pop_back();
+            cube.invert(RubiksCube::MOVE(i));
         }
 
         return minNextBound;
     }
 
 public:
-    IDAstarSolver(T startCube)
+    T rubiksCube;
+
+    IDAstarSolver(T cube, const
+                  string& dbFile)
+        : rubiksCube(cube)
     {
-        cube = startCube;
+        if (!cornerDB.fromFile(dbFile))
+            throw
+                runtime_error("Failed to load Corner Pattern Database file.");
     }
+
 
     vector<RubiksCube::MOVE> solve()
     {
-        int bound = patternDB.getEstimate(cube);
-        cout << "Initial heuristic: " << patternDB.getEstimate(cube) << "\n";
+        int bound = cornerDB.getNumMoves(rubiksCube);
 
         while (true)
         {
-            int t = search(0, bound, RubiksCube::MOVE::U, false);
+            int t = search(rubiksCube, 0, bound, -1);
 
             if (t == FOUND)
-                return path;
-
-            if (t == INT_MAX)
-                return {};
+                return moves;
 
             bound = t;
         }

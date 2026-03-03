@@ -35,14 +35,14 @@ private:
         bitboard[s1] = (bitboard[s1] & ~(one_8 << (8 * s1_3))) | (clr3 << (8 * s1_3));
     }
 
-
     int get5bitCorner(const string corner) const
     {
         int ret = 0;
         string actual_str;
         for (auto c : corner)
         {
-            if (c != 'W' && c != 'Y') continue;
+            if (c != 'W' && c != 'Y')
+                continue;
             actual_str.push_back(c);
             if (c == 'Y')
             {
@@ -52,7 +52,8 @@ private:
 
         for (auto c : corner)
         {
-            if (c != 'R' && c != 'O') continue;
+            if (c != 'R' && c != 'O')
+                continue;
             if (c == 'O')
             {
                 ret |= (1 << 1);
@@ -61,7 +62,8 @@ private:
 
         for (auto c : corner)
         {
-            if (c != 'B' && c != 'G') continue;
+            if (c != 'B' && c != 'G')
+                continue;
             if (c == 'G')
             {
                 ret |= (1 << 0);
@@ -78,8 +80,6 @@ private:
         }
         return ret;
     }
-
-
 
 public:
     uint64_t bitboard[6]{};
@@ -101,7 +101,8 @@ public:
     COLOR getColor(FACE face, unsigned row, unsigned col) const override
     {
         int idx = arr[row][col];
-        if (idx == 8) return (COLOR)((int)face);
+        if (idx == 8)
+            return (COLOR)((int)face);
 
         uint64_t side = bitboard[(int)face];
         uint64_t color = (side >> (8 * idx)) & one_8;
@@ -118,7 +119,8 @@ public:
     void setColor(FACE face, int row, int col, COLOR color) override
     {
         int idx = arr[row][col];
-        if (idx == 8) return;
+        if (idx == 8)
+            return;
 
         bitboard[(int)face] &= ~(one_8 << (8 * idx));
 
@@ -130,7 +132,8 @@ public:
     {
         for (int i = 0; i < 6; i++)
         {
-            if (solved_side_config[i] != bitboard[i]) return false;
+            if (solved_side_config[i] != bitboard[i])
+                return false;
         }
         return true;
     }
@@ -243,10 +246,10 @@ public:
 
         this->rotateSide(0, 2, 3, 4, 2, 2, 3, 4);
         this->rotateSide(2, 2, 3, 4, 5, 2, 3, 4);
-        this->rotateSide(5, 2, 3, 4, 4, 7, 6, 0);
+        this->rotateSide(5, 2, 3, 4, 4, 6, 7, 0);
 
-        bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 7))) | (clr1 << (8 * 7));
-        bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 6))) | (clr2 << (8 * 6));
+        bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 6))) | (clr1 << (8 * 6));
+        bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 7))) | (clr2 << (8 * 7));
         bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 0))) | (clr3 << (8 * 0));
 
         return *this;
@@ -345,7 +348,8 @@ public:
     {
         for (int i = 0; i < 6; i++)
         {
-            if (bitboard[i] != r1.bitboard[i]) return false;
+            if (bitboard[i] != r1.bitboard[i])
+                return false;
         }
         return true;
     }
@@ -358,7 +362,6 @@ public:
         }
         return *this;
     }
-
 
     uint64_t getCorners() const
     {
@@ -436,7 +439,8 @@ struct HashBitboard
     size_t operator()(const RubiksCubeBitboard& r1) const
     {
         uint64_t final_hash = r1.bitboard[0];
-        for (int i = 1; i < 6; i++) final_hash ^= r1.bitboard[i];
+        for (int i = 1; i < 6; i++)
+            final_hash ^= r1.bitboard[i];
         return (size_t)final_hash;
     }
 };

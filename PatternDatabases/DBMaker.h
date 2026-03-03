@@ -11,7 +11,8 @@
 
 using namespace std;
 
-class DBMaker {
+class DBMaker
+{
 private:
     string fileName;
     CornerPatternDatabase cornerDB;

@@ -24,7 +24,6 @@ public:
     };
 
 
-
     enum class COLOR
     {
         WHITE,

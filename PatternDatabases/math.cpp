@@ -14,7 +14,7 @@ uint32_t pick(uint32_t n, uint32_t k)
     return factorial(n) / factorial(n - k);
 }
 
-uint3_t choose(uint32_t n, uint32_t k)
+uint32_t choose(uint32_t n, uint32_t k)
 {
     return (n < k)
                ? 0
