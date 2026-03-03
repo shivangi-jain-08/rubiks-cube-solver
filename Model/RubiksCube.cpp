@@ -219,6 +219,7 @@ vector<RubiksCube::MOVE> RubiksCube::randomShuffle(unsigned int times)
     uniform_int_distribution<int> dist(0, 17);
 
     vector<MOVE> moves_performed;
+    srand(time(nullptr));
     moves_performed.reserve(times);
 
     MOVE lastMove = MOVE::U;
