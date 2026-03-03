@@ -24,6 +24,7 @@ public:
     };
 
 
+
     enum class COLOR
     {
         WHITE,
@@ -43,6 +44,11 @@ public:
         B, BPRIME, B2,
         D, DPRIME, D2
     };
+
+    static int faceOf(MOVE m)
+    {
+        return static_cast<int>(m) / 3;
+    }
 
     virtual COLOR getColor(FACE face, unsigned row, unsigned col) const = 0;
 

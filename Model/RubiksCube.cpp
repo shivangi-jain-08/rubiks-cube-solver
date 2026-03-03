@@ -211,16 +211,36 @@ void RubiksCube::print() const
     cout << "\n";
 }
 
+#include <random>
+
 vector<RubiksCube::MOVE> RubiksCube::randomShuffle(unsigned int times)
 {
+    static mt19937 rng(random_device{}());
+    uniform_int_distribution<int> dist(0, 17);
+
     vector<MOVE> moves_performed;
-    srand(time(0));
+    moves_performed.reserve(times);
+
+    MOVE lastMove = MOVE::U;
+    bool hasLast = false;
+
     for (unsigned int i = 0; i < times; i++)
     {
-        unsigned int selectMove = (rand() % 18);
-        moves_performed.push_back(static_cast<MOVE>(selectMove));
-        this->move(static_cast<MOVE>(selectMove));
+        MOVE move;
+
+        do
+        {
+            move = static_cast<MOVE>(dist(rng));
+        }
+        while (hasLast && faceOf(move) == faceOf(lastMove));
+
+        moves_performed.push_back(move);
+        this->move(move);
+
+        lastMove = move;
+        hasLast = true;
     }
+
     return moves_performed;
 }
 

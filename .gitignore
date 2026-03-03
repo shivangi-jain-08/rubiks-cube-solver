@@ -1,0 +1,45 @@
+.vscode
+# CLion project files
+.idea/
+cmake-build-*/
+*.iml
+
+# Build artifacts (common for C/C++ projects)
+# Compiled object files
+*.o
+*.obj
+*.lo
+*.libs
+
+# Executables
+*.exe
+*.out
+*.bin
+*.dll
+*.so
+*.a
+*.lib
+
+# Precompiled headers
+*.gch
+*.pch
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+Testing/
+_CPack_Packages/
+DartConfiguration.tcl
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# OS-specific files
+.DS_Store # macOS
+*~ # Linux/Unix backup files
+Thumbs.db # Windows
+
+# Dependency directories (if applicable)
+build/
+dist/
+bin/
